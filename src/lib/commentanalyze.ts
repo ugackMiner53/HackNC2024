@@ -53,7 +53,16 @@ type PP = {
             text: string;
           };
           requestedAttributes: PPTypes;
+        },
+    options:
+      | {
+          attributes: (keyof PPTypes)[];
+          stripHTML?: boolean;
+          truncate?: boolean;
+          doNotScore?: boolean;
+          validate?: boolean;
         }
+      | undefined
   ) => Promise<PPR>;
 };
 
