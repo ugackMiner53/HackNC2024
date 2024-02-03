@@ -1,13 +1,13 @@
 <script lang="ts">
     import { browser } from "$app/environment";
-    import { createMap } from "$lib/maphandler";
     import { onMount } from "svelte";
 
     let mapElement : HTMLDivElement;
 
     onMount(async () => {
         if (browser) {
-            createMap(mapElement);
+            const MapHandler = await import("$lib/maphandler");
+            MapHandler.createMap(mapElement);
         }
     })
 </script>
