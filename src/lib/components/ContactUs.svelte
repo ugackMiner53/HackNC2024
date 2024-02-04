@@ -13,7 +13,9 @@
       email = "";
       message = "";
     };
-    
+    const navigateToLandingPage = () => {
+        window.location.href = 'http://localhost:5173/'; // Change this to your landing page URL
+    };
 </script>
 <body class="mybg">
 </body>
@@ -48,7 +50,7 @@
       
     }
 </style>
-
+<button on:click={navigateToLandingPage} class="back-button">Back to Landing Page</button>
 <div class="background">
     <form on:submit|preventDefault={handleSubmit}>
         <label for="name">Name:</label>
