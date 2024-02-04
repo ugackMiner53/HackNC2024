@@ -23,10 +23,11 @@ export const viewingImages: Writable<PublicImage[] | undefined> = writable(undef
 
 const records = new Map<UUID, RecordMarker>();
 
-let markerIcon: L.Icon;
+export let markerIcon: L.Icon;
 let markerImportantIcon: L.Icon;
 let userCircle: L.CircleMarker;
-let currRoute: RecordMarker[] = [];
+export const currRoute: Writable<RecordMarker[]> = writable([]);
+export let activeRoute: PublicRoute | undefined;
 
 let L: typeof import('leaflet');
 
@@ -122,8 +123,9 @@ export function createRecordMarker(record: PublicRecord) {
 
 function handleMarkerClick(marker: RecordMarker) {
   if (get(interactivityState) === INTERACTIVITY_STATES.ROUTING) {
-    currRoute.push(marker);
+    get(currRoute).push(marker);
     marker.setIcon(markerImportantIcon);
+    currRoute.set(get(currRoute));
     return;
   }
   activeRecord.set(marker._record);
@@ -151,12 +153,14 @@ function handleClick(clickEvent: L.LeafletMouseEvent) {
 
 export async function createRoute() {
   interactivityState.set(INTERACTIVITY_STATES.DEFAULT);
-  if (currRoute.length === 0) return;
+  if (get(currRoute).length === 0) return;
   const data: PublicRoute = await (
     await fetch(
-      `/api/route?name=${prompt('name')}&desc=${prompt('desc')}&recs=${currRoute.map((v) => v._record.uuid).join(',')}`
+      `/api/route?name=${prompt('name')}&desc=${prompt('desc')}&recs=${get(currRoute).map((v) => v._record.uuid).join(',')}`, { method: 'POST' }
     )
   ).json();
-  currRoute.forEach((v) => v.setIcon(markerIcon));
-  currRoute = [];
+  get(currRoute).forEach((v) => v.setIcon(markerIcon));
+  currRoute.set([]);
+
+  activeRoute = data;
 }
