@@ -37,7 +37,7 @@
 </style>
 
 <div transition:slideMinWidth={{duration: 300, axis: "x"}} class="sidebar">
-    <button on:click={hideSidebar}> 
+    <button on:click={hideSidebar} style="position: sticky; top: 0%"> 
         <!-- Temporary -->
         <h1>Go back</h1>
     </button>

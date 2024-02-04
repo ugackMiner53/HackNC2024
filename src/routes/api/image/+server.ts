@@ -1,6 +1,7 @@
 import { DataBase, type PublicImage } from '$lib/server/database';
 import { isUUID } from '$lib/typecheck.js';
 import { error, json } from '@sveltejs/kit';
+import type { UUID } from 'crypto';
 
 export async function POST({ url, request }) {
   const formData = Object.fromEntries(await request.formData());
@@ -20,4 +21,14 @@ export async function POST({ url, request }) {
   }
 
   return json(img);
+}
+
+export async function GET({ url }) {
+  if (!url.searchParams.has('ids')) return error(400, { message: 'invalid param' });
+  const ids = (url.searchParams.get('ids') as string).split(',');
+  if (!ids.every((v) => isUUID(v))) return error(400, { message: 'invalid param' });
+  const imgs = ids.map(v => DataBase.getImage(v as UUID));
+  if (!imgs.every((v) => v)) return error(404, { message: 'invalid param' });
+
+  return json(imgs);
 }

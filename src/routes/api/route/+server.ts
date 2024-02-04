@@ -3,13 +3,14 @@ import { isUUID } from '$lib/typecheck.js';
 import { error, json } from '@sveltejs/kit';
 import type { UUID } from 'crypto';
 
-export function GET({ url }) {
-  const lat = Number(url.searchParams.get('lat')) + 90;
-  const lon = Number(url.searchParams.get('lon')) + 180;
+export async function GET({ url }) {
+  if (!url.searchParams.has('ids')) return error(400, { message: 'invalid param' });
+  const ids = (url.searchParams.get('ids') as string).split(',');
+  if (!ids.every((v) => isUUID(v))) return error(400, { message: 'invalid param' });
+  const routs = ids.map(v => DataBase.getRoute(v as UUID));
+  if (!routs.every((v) => v)) return error(404, { message: 'invalid param' });
 
-  if (Number.isNaN(lat) || Number.isNaN(lon)) return error(400, { message: 'invalid param' });
-
-  return json(DataBase.getNearby(lat, lon));
+  return json(routs);
 }
 
 export async function POST({ url }) {
