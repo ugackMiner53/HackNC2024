@@ -70,14 +70,21 @@
   async function submitComment(event : SubmitEvent, uuid : UUID) {    
     const searchParams = new URLSearchParams();
     searchParams.set("id", uuid);
-    searchParams.set("text", new FormData(<HTMLFormElement>event.currentTarget).get("comment") as string);
+    searchParams.set("text", new FormData(<HTMLFormElement>event.target).get("comment") as string);
     const comment = await (
         await fetch('/api/comment?' + searchParams, {
             method: 'POST'
         })
-    ).json();
+    ).json(); 
+    
+    if (comment.uuid) {
+        comments.push(comment);
+        comments = comments;
+        (<HTMLInputElement>(<HTMLFormElement>event.target).querySelector("input#commentInput")).value = "";
+    } else {
+        (<HTMLInputElement>(<HTMLFormElement>event.target).querySelector("input#commentInput")).value = "Your content has been blocked for inappropriate or derogatory language.";
+    }
 
-    comments.push(comment);
     return false;
 }
 
@@ -195,7 +202,7 @@
         </div>
         
         <ul class="comment-list">
-            {#await getAllComments() then comments}
+            {#await getAllComments() then}
                 {#each comments as comment}
                     <li class="comment">{comment.text}</li>
                 {/each}
