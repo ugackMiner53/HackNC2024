@@ -73,15 +73,15 @@ function load() {
 }
 load();
 function eucMod(n: number, m: number): number {
-  // return ((n % m) + m) % m;
-  return n < 0 ? n + m : n >= m ? n - m : n;
+  const a = n % m;
+  return a < 0 ? a + m : a;
 }
-function getRecords(lat: number, lon: number): Record[] {
+function getRecords(lat: number, lon: number): UUID[] {
   lat = ~~lat;
   lon = ~~lon;
-  return data.cells[lat][lon].map((v) => data.records[v]);
+  return data.cells[lat][lon].map((v) => data.records[v].uuid);
 }
-function getNearbyRecords(lat: number, lon: number): Record[] {
+function getNearbyRecords(lat: number, lon: number): UUID[] {
   return [
     getRecords(eucMod(lat - 1, 180), eucMod(lon - 1, 360)),
     getRecords(eucMod(lat - 1, 180), eucMod(lon + 0, 360)),
@@ -145,10 +145,14 @@ async function validateText(txt: string): Promise<boolean> {
 }
 export class DataBase {
   static getNearest(lat: number, lon: number): PublicRecord | undefined {
+    lat = eucMod(lat, 180);
+    lon = eucMod(lon, 360);
     return DataBase.getNearby(lat, lon)[0];
   }
   static getNearby(lat: number, lon: number, filter?: (record: PublicRecord) => boolean): PublicRecord[] {
-    let arr = getNearbyRecords(lat, lon);
+    lat = eucMod(lat, 180);
+    lon = eucMod(lon, 360);
+    let arr = getNearbyRecords(lat, lon).map((v) => getRecord(v) as Record);
     if (filter !== undefined) arr = arr.filter((v) => filter(v));
     return arr.sort((a, b) => dist(lat, lon, a.lat, a.lon) - dist(lat, lon, b.lat, b.lon));
   }
@@ -159,6 +163,8 @@ export class DataBase {
   static async addRecord(lat: number, lon: number, name: string, desc: string): Promise<PublicRecord | undefined> {
     if (!validateText(name)) return;
     if (!validateText(desc)) return;
+    lat = eucMod(lat, 180);
+    lon = eucMod(lon, 360);
     const uuid = randomUUID();
     const record: Record = {
       uuid,
@@ -171,6 +177,7 @@ export class DataBase {
       routes: []
     };
     data.records[uuid] = record;
+    getRecords(lat, lon).push(uuid);
     trySave();
     return record;
   }
@@ -187,6 +194,7 @@ export class DataBase {
     });
     rec.comments.forEach((v) => DataBase.deleteComment(v));
     rec.images.forEach((v) => DataBase.deleteImage(v));
+    delArr(getRecords(rec.lat, rec.lon), u);
     trySave();
     return rec;
   }
