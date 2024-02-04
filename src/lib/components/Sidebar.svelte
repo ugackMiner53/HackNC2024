@@ -25,10 +25,14 @@
         background-color: white;
         display: flex;
         flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
         position: fixed;
         top: 0;
         left: 0;
         z-index: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 </style>
 

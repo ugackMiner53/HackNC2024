@@ -18,7 +18,7 @@ export const interactivityState = writable(INTERACTIVITY_STATES.DEFAULT);
 export const activeRecord: Writable<PublicRecord | undefined> = writable(undefined);
 export let map: L.Map;
 export let selectionMarker: L.Marker | undefined;
-export let viewingImages: PublicImage[] | undefined;
+export const viewingImages: Writable<PublicImage[] | undefined> = writable(undefined);
 
 const records = new Set<UUID>();
 
