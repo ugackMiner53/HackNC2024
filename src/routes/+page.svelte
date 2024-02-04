@@ -20,10 +20,10 @@
 </style>
 <h1 style="font-family:'Papyrus'">A Walk Through History</h1>
 <h2>You don't have to be in a museum to walk through history</h2>
-<p>&nbsp</p>
+<br>
 <button class="buttons" type="button" on:click={() => goto("./contacts")}>Contact Us</button>
 <button class="buttons" type="button" on:click={() => goto("./about")}>About Us</button>
 <button class="buttons" type="button" on:click={() => goto("./map")}>Go to App</button>
 <p>&nbsp</p>
 <a href="https://nmaahc.si.edu/" target="_blank"><img src={image} alt="National Museum of African American History and Culture" width = "50%" height = "50%"></a>
-<p>&nbsp</p>
+<br>

@@ -3,7 +3,7 @@
     import image from "$lib/assets/bg.webp";
 </script>
   
-<div class="bg">
+<div class="bg strokeme">
     <h1>Contact Us</h1>
     <ContactUs />
 </div>
@@ -20,5 +20,14 @@
         background-image: url("https://jobs.globalpayments.com/media/sowbjwkj/gpn_brand-mastheads_netspend-nextep-xenial.jpg?anchor=center&mode=crop&width=1600&height=900&mode=crop&quality=75"); 
         background-size: 100% 100%; 
         background-attachment: fixed;
+    }
+    .strokeme
+    {
+        color: white;
+        text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;  
     }
 </style>
