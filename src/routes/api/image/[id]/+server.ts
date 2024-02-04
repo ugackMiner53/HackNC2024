@@ -1,12 +1,11 @@
 import { readFile } from 'fs/promises';
 import { error } from '@sveltejs/kit';
+import { isUUID } from '$lib/typecheck.js';
 
 export async function GET({ params }) {
-    if (!/^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/.test(params.id)) {
-        console.log("FRICK YOU");
+    if (!isUUID(params.id)) {
         return error(400);
     }
-    console.log("ILY")
 
     try {
         const image = await readFile(`./src/lib/bucket/${params.id}.img`);

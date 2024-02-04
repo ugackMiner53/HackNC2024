@@ -1,7 +1,10 @@
 <script lang="ts">
     import { slide, type SlideParams } from "svelte/transition";
 
+    export let showToolbar : boolean;
+
     function slideMinWidth(node : HTMLElement, properties : SlideParams) {
+        // TODO: fix
         node.style.minWidth = "0";
         const result = slide(node, properties);
         setTimeout(() => {
@@ -33,6 +36,10 @@
 </style>
 
 <div transition:slideMinWidth={{duration: 300, axis: "x"}} class="toolbar">
+    <button on:click={() => {showToolbar = false}} class="toolbar-item"> 
+        <!-- Temporary -->
+        <h1>Go back</h1>
+    </button>
     <button class="toolbar-item">
         <h1>Map</h1>
     </button>

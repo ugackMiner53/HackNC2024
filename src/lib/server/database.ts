@@ -15,27 +15,27 @@ interface Record {
   comments: UUID[];
   routes: UUID[];
 }
-type PublicRecord = Readonly<Record>;
+export type PublicRecord = Readonly<Record>;
 interface Route {
   uuid: UUID;
   nodes: UUID[];
   name: string;
   desc: string;
 }
-type PublicRoute = Readonly<Route>;
+export type PublicRoute = Readonly<Route>;
 interface Comment {
   uuid: UUID;
   ruuid?: UUID;
   text: string;
 }
-type PublicComment = Readonly<Comment>;
+export type PublicComment = Readonly<Comment>;
 interface Image {
   uuid: UUID;
   ruuid?: UUID;
   path: string;
   ext: string;
 }
-type PublicImage = Readonly<Image>;
+export type PublicImage = Readonly<Image>;
 
 // trust trust
 const STORAGE_PATH: string = './data.json';
@@ -62,7 +62,7 @@ function load() {
   if (existsSync(STORAGE_PATH)) data = JSON.parse(readFileSync(STORAGE_PATH).toString());
   else {
     data = {
-      cells: new Array(180).fill(0).map(() => new Array(360)),
+      cells: new Array(180).fill(0).map(() => new Array(360).fill(0).map(() => [])),
       records: {},
       routes: {},
       comments: {},
@@ -79,7 +79,7 @@ function eucMod(n: number, m: number): number {
 function getRecords(lat: number, lon: number): UUID[] {
   lat = ~~lat;
   lon = ~~lon;
-  return data.cells[lat][lon].map((v) => data.records[v].uuid);
+  return data.cells[lat][lon];
 }
 function getNearbyRecords(lat: number, lon: number): UUID[] {
   return [

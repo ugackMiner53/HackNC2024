@@ -3,39 +3,50 @@
     import Map from "$lib/components/Map.svelte";
     import Toolbar from "$lib/components/Toolbar.svelte";
     import { onMount } from "svelte";
+    import type { PublicRoute } from "$lib/server/database"
+    import { fade } from "svelte/transition";
 
-    let showToolbar = true;
+    let showToolbar = false;
 
-    onMount(() => {
+    onMount(async () => {
         const routeUUID = $page.url.searchParams.get("route");
         if (routeUUID) {
-            const route = fetch(`/api/route/${routeUUID}`);
-
+            const route : PublicRoute = await (await fetch(`/api/route/${routeUUID}`)).json();
+            
         }
     })
 </script>
 
+
 <style>
-    :global(body) {
-        background-color: red;
+    .menu {
+        z-index: 1;
+        position: fixed;
+        margin: 10px;
+        top: 0;
+        left: 0;
+    }
+
+    .menu > button {
+        width: 10vh;
+        height: 10vh;
+        font-size: 10vh;
+        background: none;
+        font-weight: bold;
+        text-align: center;
+        cursor: pointer;
+        border: none;
     }
 </style>
 
-<link rel="stylesheet" href="/leaflet.css" />
-
-<!-- <h1 style="position: absolute; z-index: 999;">Hello </h1> -->
-
-<button on:click={() => {showToolbar = !showToolbar}} style="position: absolute; right:0;"> reversi</button>
-
-<!-- If show toolbar -->
 {#if showToolbar}
-<!-- Toolbar would go here -->
-    <Toolbar />
+    <Toolbar bind:showToolbar={showToolbar} />
 {:else}
-<!-- Else show menu -->
-
+    <div transition:fade={{delay: 300, duration: 100}} class="menu">
+        <button on:click={() => {showToolbar = true;}}>&gt;</button>
+    </div>
 {/if}
 
 <!-- Search bar -->
 
-<!-- <Map /> -->
+<Map />
