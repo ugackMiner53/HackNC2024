@@ -13,7 +13,10 @@
       email = "";
       message = "";
     };
+    
 </script>
+<body class="mybg">
+</body>
   
 <style>
     /* Add your custom styles here */
@@ -45,17 +48,19 @@
       
     }
 </style>
-  
-<form on:submit|preventDefault={handleSubmit}>
-    <label for="name">Name:</label>
-    <input type="text" id="name" bind:value={name} required />
-  
-    <label for="email">Email:</label>
-    <input type="email" id="email" bind:value={email} required />
-  
-    <label for="comment">Message:</label>
-    <textarea id="comment" bind:value={message} rows="4" required></textarea>
-  
-    <button type="submit">Submit</button>
 
-</form>
+<div class="background">
+    <form on:submit|preventDefault={handleSubmit}>
+        <label for="name">Name:</label>
+        <input type="text" id="name" bind:value={name} required />
+      
+        <label for="email">Email:</label>
+        <input type="email" id="email" bind:value={email} required />
+      
+        <label for="comment">Message:</label>
+        <textarea id="comment" bind:value={message} rows="4" required></textarea>
+      
+        <button type="submit">Submit</button>
+    
+    </form>
+</div>

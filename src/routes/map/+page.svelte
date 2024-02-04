@@ -15,12 +15,6 @@
     })
 </script>
 
-<style>
-    :global(body) {
-        background-color: red;
-    }
-</style>
-
 <link rel="stylesheet" href="/leaflet.css" />
 
 <!-- <h1 style="position: absolute; z-index: 999;">Hello </h1> -->
