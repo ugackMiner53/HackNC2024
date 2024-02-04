@@ -2,14 +2,10 @@
     import { slide, type SlideParams } from "svelte/transition";
 
     function slideMinWidth(node : HTMLElement, properties : SlideParams) {
-        console.log("Setting...");
-        console.log(node.style.minWidth);
         node.style.minWidth = "0";
-        console.log(node.style.minWidth);
         const result = slide(node, properties);
         setTimeout(() => {
-            console.log("Resetting!");
-            node.style.minWidth = "200";
+            node.style.minWidth = "200px";
         }, properties.duration ?? 0  - 5);
         return result;
     }

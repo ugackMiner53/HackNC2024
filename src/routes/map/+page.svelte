@@ -1,8 +1,18 @@
 <script lang="ts">
+    import { page } from "$app/stores";
     import Map from "$lib/components/Map.svelte";
     import Toolbar from "$lib/components/Toolbar.svelte";
+    import { onMount } from "svelte";
 
     let showToolbar = true;
+
+    onMount(() => {
+        const routeUUID = $page.url.searchParams.get("route");
+        if (routeUUID) {
+            const route = fetch(`/api/route/${routeUUID}`);
+
+        }
+    })
 </script>
 
 <style>
