@@ -8,7 +8,8 @@ export enum INTERACTIVITY_STATES {
   ADD_DETAILS,
   ADD_DETAILS_SUBMITTING,
   VIEW_IMAGES,
-  ROUTING
+  ROUTING,
+  ROUTE_PLAYBACK
 }
 
 interface RecordMarker extends L.Marker {
@@ -21,7 +22,7 @@ export let map: L.Map;
 export let selectionMarker: L.Marker | undefined;
 export const viewingImages: Writable<PublicImage[] | undefined> = writable(undefined);
 
-const records = new Map<UUID, RecordMarker>();
+export const records = new Map<UUID, RecordMarker>();
 
 export let markerIcon: L.Icon;
 let markerImportantIcon: L.Icon;
@@ -152,7 +153,7 @@ function handleClick(clickEvent: L.LeafletMouseEvent) {
 }
 
 export async function createRoute() {
-  interactivityState.set(INTERACTIVITY_STATES.DEFAULT);
+  interactivityState.set(INTERACTIVITY_STATES.ROUTE_PLAYBACK);
   if (get(currRoute).length === 0) return;
   const data: PublicRoute = await (
     await fetch(
@@ -162,5 +163,11 @@ export async function createRoute() {
   get(currRoute).forEach((v) => v.setIcon(markerIcon));
   currRoute.set([]);
 
-  activeRoute = data;
+  setActiveRoute(data);
+}
+
+export async function setActiveRoute(route: PublicRoute | undefined) {
+  if (activeRoute) activeRoute.nodes.forEach(v => records.get(v)?.setIcon(markerIcon));
+  activeRoute = route;
+  if (activeRoute) activeRoute.nodes.forEach(v => records.get(v)?.setIcon(markerImportantIcon));
 }

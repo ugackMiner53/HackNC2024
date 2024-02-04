@@ -20,6 +20,9 @@
         createRoute,
         currRoute,
         markerIcon,
+        activeRoute,
+        records,
+        setActiveRoute,
     } from "$lib/maphandler";
     import Modal from "$lib/components/Modal.svelte";
     import type { UUID } from "crypto";
@@ -231,26 +234,29 @@
 {/if}
 
 
-{#if $interactivityState == INTERACTIVITY_STATES.ROUTING}
+{#if $interactivityState == INTERACTIVITY_STATES.ROUTING || $interactivityState == INTERACTIVITY_STATES.ROUTE_PLAYBACK}
     <Sidebar onRight={true} hideSidebar={(evn) => {hideToolbar(evn); $interactivityState = INTERACTIVITY_STATES.DEFAULT}}>
         <ul style="padding: 0">
-            {#each $currRoute as routeEntry}
+            {#each ($interactivityState == INTERACTIVITY_STATES.ROUTE_PLAYBACK ? activeRoute === undefined ? [] : activeRoute.nodes.map(v => (records.get(v) || {})._record).filter(v => v) : $currRoute.map(v => v._record)) as routeEntry}
                 <li style="list-style-type: none; padding: 0; margin: 0;">
                     <div style="display: flex; flex-direction: row; justify-content: flex-start; align-items: stretch; max-width: 100%; flex-wrap: nowrap; column-gap: 5px">
-                        <button on:click={() => {
-                            const i = $currRoute.findIndex(v => v._record.uuid === routeEntry._record.uuid);
-                            routeEntry.setIcon(markerIcon);
-                            $currRoute.splice(i, 1);
-                            $currRoute = $currRoute;
-                        }}>✖</button>
+                        {#if $interactivityState == INTERACTIVITY_STATES.ROUTING}
+                            <button on:click={() => {
+                                const i = $currRoute.findIndex(v => v._record.uuid === routeEntry?.uuid);
+                                // @ts-expect-error I hate them
+                                records.get(routeEntry.uuid).setIcon(markerIcon);
+                                $currRoute.splice(i, 1);
+                                $currRoute = $currRoute;
+                            }}>✖</button>
+                        {/if}
                         <!-- svelte-ignore a11y-click-events-have-key-events -->
                         <!-- svelte-ignore a11y-no-static-element-interactions -->
-                        <span on:click={() => {$activeRecord = routeEntry._record}} style="cursor: pointer; flex-basis: 0; flex-grow: 1; text-overflow: ellipsis; overflow: hidden">{routeEntry._record.name}</span>
+                        <span on:click={() => {$activeRecord = routeEntry}} style="cursor: pointer; flex-basis: 0; flex-grow: 1; text-overflow: ellipsis; overflow: hidden">{routeEntry?.name}</span>
                     </div>
                 </li>
             {/each}
         </ul>
-        <button on:click={() => createRoute()} style="z-index: 5">End Route</button>
+        <button on:click={() => $interactivityState == INTERACTIVITY_STATES.ROUTING ? createRoute() : (setActiveRoute(undefined), $interactivityState = INTERACTIVITY_STATES.DEFAULT) } style="z-index: 5">{$interactivityState == INTERACTIVITY_STATES.ROUTING ? "Publish" : "End Route"}</button>
     </Sidebar>
 {/if}
 
@@ -277,6 +283,13 @@
             showToolbar = false;
         }} class="toolbar-item">
             <h1>Routes</h1>
+        </button>
+        <button on:click={(evn) => {
+            $interactivityState = INTERACTIVITY_STATES.ROUTE_PLAYBACK;
+            hideToolbar(evn);
+            showToolbar = false;
+        }} class="toolbar-item">
+            <h1>Find Routes</h1>
         </button>
         <button class="toolbar-item">
             <h1>About</h1>

@@ -29,3 +29,4 @@
 <p style="font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">National Museum of African American History and Culture in Washington, DC</p>
 <a href="https://nmaahc.si.edu/" target="_blank"><img src={image} alt="National Museum of African American History and Culture" width = "50%" height = "50%"></a>
 <br>
+<p style="position: fixed; bottom: 10px; right: 10px; font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;">Proud to be GPT-Free</p>
