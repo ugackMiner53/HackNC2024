@@ -5,6 +5,8 @@
     import { onMount } from "svelte";
     import type { PublicRoute } from "$lib/server/database"
     import { fade } from "svelte/transition";
+    import { INTERACTIVITY_STATES, interactivityState } from "$lib/maphandler";
+    import Modal from "$lib/components/Modal.svelte";
 
     let showToolbar = false;
 
@@ -37,7 +39,28 @@
         cursor: pointer;
         border: none;
     }
+
+    textarea {
+        width: 90%;
+        height: 40%;
+        resize: none;
+    }
 </style>
+
+{#if $interactivityState == INTERACTIVITY_STATES.ADD_DETAILS }
+    <Modal closeButton={true} closeFunction={() => {$interactivityState = INTERACTIVITY_STATES.DEFAULT}}>
+        <h2>Enter the Landmark!</h2>
+
+        <label for="name">Name</label>
+        <input type="text" name="name">
+
+        <label for="desc">Description</label>
+        <textarea name="desc" />
+
+        <button>Submit</button>
+    </Modal>
+{/if}
+
 
 {#if showToolbar}
     <Toolbar bind:showToolbar={showToolbar} />

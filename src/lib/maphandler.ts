@@ -1,10 +1,25 @@
-import * as L from "leaflet";
+import { get, writable } from "svelte/store";
+import type { PublicRecord } from "./server/database";
 
+export enum INTERACTIVITY_STATES {
+    DEFAULT,
+    ADD,
+    ADD_DETAILS,
+
+}
+
+export const interactivityState = writable(INTERACTIVITY_STATES.DEFAULT);
 export let map : L.Map;
 
 let markerIcon : L.Icon;
-
 let userCircle : L.CircleMarker;
+
+let L : typeof import("leaflet");
+
+export async function importLeaflet() {
+    L = await import("leaflet");
+    console.log(typeof L);
+}
 
 export function createMap(mapElement : HTMLDivElement) : L.Map {
     map = L.map(mapElement, {
@@ -14,7 +29,7 @@ export function createMap(mapElement : HTMLDivElement) : L.Map {
         zoomControl: false
     });
     
-    map.setView([0, 0], 17);
+    map.setView([35.77, -78.68], 17);
 
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
@@ -26,12 +41,13 @@ export function createMap(mapElement : HTMLDivElement) : L.Map {
 }
 
 export function createMarkerIcon() : L.Icon {
-    return new L.Icon({
+    markerIcon = new L.Icon({
         iconUrl: "/images/marker-icon-2x.png",
         iconSize: [50/2, 82/2],
         iconAnchor: [50/4, 82/2],
         shadowSize: [0, 0]
     });
+    return markerIcon;
 }
 
 export function drawCurrentPosition(lat : number, lon : number) {
@@ -45,14 +61,17 @@ export function drawCurrentPosition(lat : number, lon : number) {
     }
 }
 
+function createRecordMarker(record : PublicRecord) {
+    return;
+}
+
 
 function handleClick(clickEvent : L.LeafletMouseEvent) {
-
-    // Assume the user is always in add mode
-    const marker = L.marker(clickEvent.latlng, {icon: markerIcon}).addTo(map);
-    marker.on("click", (clickEvent : L.LeafletMouseEvent) => {
-        L.popup().setLatLng(clickEvent.latlng).setContent("Hi").addTo(map);
-    })
-
-    // L.popup().setLatLng(clickEvent.latlng).setContent("ex").openOn(map);
+    switch (get(interactivityState)) {
+        case INTERACTIVITY_STATES.ADD: {
+            const marker = L.marker(clickEvent.latlng, {icon: markerIcon}).addTo(map);
+            interactivityState.set(INTERACTIVITY_STATES.ADD_DETAILS);
+            break;
+        }
+    }
 }

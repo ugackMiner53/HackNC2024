@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { INTERACTIVITY_STATES, interactivityState } from "$lib/maphandler";
     import { slide, type SlideParams } from "svelte/transition";
 
     export let showToolbar : boolean;
@@ -39,6 +40,9 @@
     <button on:click={() => {showToolbar = false}} class="toolbar-item"> 
         <!-- Temporary -->
         <h1>Go back</h1>
+    </button>
+    <button on:click={() => {$interactivityState = INTERACTIVITY_STATES.ADD}} class="toolbar-item">
+        <h1>Add Site</h1>
     </button>
     <button class="toolbar-item">
         <h1>Map</h1>
