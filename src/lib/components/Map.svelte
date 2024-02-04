@@ -13,7 +13,7 @@
 </script>
 
 <style>
-    #map {
+    .map {
         height: 100%;
         width: 100%;
         position: fixed;
@@ -22,4 +22,4 @@
     }
 </style>
 
-<div id="map" bind:this={mapElement} />
+<div class="map" bind:this={mapElement} />
