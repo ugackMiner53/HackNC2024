@@ -1,5 +1,6 @@
-import { get, writable } from "svelte/store";
+import { get, writable, type Writable } from "svelte/store";
 import type { PublicRecord } from "./server/database";
+import type { UUID } from "crypto";
 
 export enum INTERACTIVITY_STATES {
     DEFAULT,
@@ -8,8 +9,16 @@ export enum INTERACTIVITY_STATES {
     ADD_DETAILS_SUBMITTING
 }
 
+interface RecordMarker extends L.Marker {
+    _record: PublicRecord;
+}
+
 export const interactivityState = writable(INTERACTIVITY_STATES.DEFAULT);
+export const activeRecord : Writable<PublicRecord|undefined> = writable(undefined);
 export let map : L.Map;
+export let selectionMarker : L.Marker;
+
+const records = new Set<UUID>();
 
 let markerIcon : L.Icon;
 let userCircle : L.CircleMarker;
@@ -36,6 +45,8 @@ export function createMap(mapElement : HTMLDivElement) : L.Map {
     }).addTo(map);
 
     map.on("click", handleClick);
+    map.on("dragend", loadRecordsInView);
+    loadRecordsInView();
     return map;
 }
 
@@ -60,18 +71,29 @@ export function drawCurrentPosition(lat : number, lon : number) {
     }
 }
 
-export function createRecordMarker(record : PublicRecord) {
-    const marker = L.marker({lat: record.lat, lng: record.lon}, {
-        interactive: true,
-        icon: markerIcon
-    }).addTo(map);
-    marker.on("click", () => handleMarkerClick(marker));
+async function loadRecordsInView() {
+    const {lat, lng: lon} = map.getCenter();
+    const localRecords : PublicRecord[] = await (await fetch(`/api/record?lat=${lat}&lon=${lon}`)).json();
+    for (const record of localRecords) {
+        if (!records.has(record.uuid))
+            createRecordMarker(record);
+    }
 }
 
-function handleMarkerClick(marker : L.Marker) {
-    L.popup({
-        content: "This is a thingy",
-    }).setLatLng(marker.getLatLng());
+export function createRecordMarker(record : PublicRecord) {
+    const marker : RecordMarker = Object.assign(L.marker({lat: record.lat, lng: record.lon}, {
+        interactive: true,
+        icon: markerIcon
+    }), {_record: record});
+
+    marker.on("click", () => handleMarkerClick(marker));
+    marker.addTo(map);
+
+    records.add(record.uuid);
+}
+
+function handleMarkerClick(marker : RecordMarker) {
+    activeRecord.set(marker._record);
 }
 
 export let lastClick : L.LeafletMouseEvent;
@@ -79,7 +101,10 @@ export let lastClick : L.LeafletMouseEvent;
 function handleClick(clickEvent : L.LeafletMouseEvent) {
     switch (get(interactivityState)) {
         case INTERACTIVITY_STATES.ADD: {
-            L.marker(clickEvent.latlng, {icon: markerIcon}).addTo(map); // This needs to be removed later... but how?
+            selectionMarker = L.marker(clickEvent.latlng, {
+                icon: markerIcon,
+                opacity: .75
+            }).addTo(map); // This needs to be removed later... but how?
             interactivityState.set(INTERACTIVITY_STATES.ADD_DETAILS);
             break;
         }
