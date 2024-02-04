@@ -3,7 +3,7 @@
   import Map from '$lib/components/Map.svelte';
   import Sidebar from '$lib/components/Sidebar.svelte';
   import { onMount } from 'svelte';
-  import type { PublicImage, PublicRecord, PublicRoute } from '$lib/server/database';
+  import type { PublicImage, PublicRecord, PublicRoute, PublicComment } from '$lib/server/database';
   import { fade } from 'svelte/transition';
   import {
     INTERACTIVITY_STATES,
@@ -25,6 +25,7 @@
   let profanityTriggered = false;
 
   let currImageI = 0;
+  let comments: PublicComment[] = [];
 
   onMount(async () => {
     const routeUUID = $page.url.searchParams.get('route');
@@ -66,19 +67,28 @@
     }
   }
 
+  async function submitComment(event : SubmitEvent, uuid : UUID) {    
+    const searchParams = new URLSearchParams();
+    searchParams.set("id", uuid);
+    searchParams.set("text", new FormData(<HTMLFormElement>event.currentTarget).get("comment") as string);
+    const comment = await (
+        await fetch('/api/comment?' + searchParams, {
+            method: 'POST'
+        })
+    ).json();
+
+    comments.push(comment);
+    return false;
+}
+
+    async function getAllComments(): Promise<PublicComment[]> {
+        if ($activeRecord?.comments.length === 0) return [];
+        return comments = await (await fetch(`/api/comment?ids=${$activeRecord?.comments.join(',')}`)).json();
+    }
+
     function hideToolbar(event : MouseEvent & {currentTarget: EventTarget & HTMLButtonElement}) {
         if (event.currentTarget.parentElement)
             event.currentTarget.parentElement.style.minWidth = '0';
-    }
-
-    async function imageSubmitEvent(node : HTMLFormElement, uuid: UUID) {
-        const formData = new FormData(node);
-        const response = await fetch(`/api/image?id=${uuid}`, {
-            method: "POST",
-            body: formData
-        })
-        $activeRecord = await (await fetch(`./api/record/${uuid}`)).json();
-        return false;
     }
 
     async function loadImages(imgs: UUID[]): Promise<PublicImage[]> {
@@ -162,7 +172,7 @@
                         return; 
                     $viewingImages = await loadImages($activeRecord.images);
                     $interactivityState = INTERACTIVITY_STATES.VIEW_IMAGES;
-                }} class="image-container" style="flex-grow: 0; cursor: pointer">
+                }} class="image-container" style="cursor: pointer">
                     <img class="image-image" src={`/images/bucket/${imageUUID}.png`} alt="">
                     <UploadButton />
                 </button>
@@ -174,6 +184,23 @@
             </div>
         {/if}
         <div class="centerme"><p class="record-description">{$activeRecord.desc}</p></div>
+
+        <div class="image-container">
+            <form method="post" on:submit|preventDefault={evn => $activeRecord !== undefined && (submitComment(evn, $activeRecord.uuid), false)}>
+                <div style="position: flex; flex-direction: row; justify-content: center; align-items: center">
+                    <input style="flex-grow: 1" type="text" placeholder="Tell us about your experiences here..." name="comment" id="commentInput" autocomplete="off">
+                    <button style="padding: 5px" type="submit">Post</button>
+                </div>
+            </form>
+        </div>
+        
+        <ul class="comment-list">
+            {#await getAllComments() then comments}
+                {#each comments as comment}
+                    <li class="comment">{comment.text}</li>
+                {/each}
+            {/await}
+        </ul>
     </Sidebar>
 {:else}
     <div transition:fade={{delay: 300, duration: 100}} class="menu">
@@ -299,5 +326,15 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+  }
+  .comment-list {
+    position: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+    row-gap: 5px;
+  }
+  .comment {
+    white-space: break-spaces;
   }
 </style>

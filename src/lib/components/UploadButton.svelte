@@ -37,5 +37,4 @@
             imageSubmitEvent(evn.currentTarget.parentElement?.parentElement, $activeRecord.uuid)
         }>
     </label>
-    
 </form>
