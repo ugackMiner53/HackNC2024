@@ -1,5 +1,6 @@
 <script lang="ts">
     import { browser } from "$app/environment";
+    import { INTERACTIVITY_STATES, interactivityState } from "$lib/maphandler";
     import { onMount } from "svelte";
 
     let mapElement : HTMLDivElement;
@@ -38,7 +39,16 @@
         position: fixed;
         top: 0;
         left: 0;
+        box-sizing: border-box;
     }
 </style>
+
+{#if $interactivityState === INTERACTIVITY_STATES.ADD}
+    <style>
+        .map {
+            border: 5px dashed purple;
+        }
+    </style>
+{/if}
 
 <div class="map" bind:this={mapElement} />

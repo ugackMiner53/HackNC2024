@@ -1,9 +1,11 @@
 <script lang="ts">
-    import type { MouseEventHandler } from "svelte/elements";
+    import { createEventDispatcher } from "svelte";
     import { fade } from "svelte/transition";
 
     export let closeButton = false;
-    export let closeFunction : MouseEventHandler<HTMLButtonElement>;
+    
+    const dispatch = createEventDispatcher();
+
 </script>
 
 <style>
@@ -56,7 +58,7 @@
 
 <div transition:fade={{duration: 500, delay: 30}} class="background">
     <div class="modal">
-        <button class="close" on:click={closeFunction}>✖</button>
+        <button class="close" on:click={() => dispatch("close")}>✖</button>
         <slot />
     </div>
 </div>

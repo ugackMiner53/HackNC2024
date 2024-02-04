@@ -5,7 +5,7 @@ export enum INTERACTIVITY_STATES {
     DEFAULT,
     ADD,
     ADD_DETAILS,
-
+    ADD_DETAILS_SUBMITTING
 }
 
 export const interactivityState = writable(INTERACTIVITY_STATES.DEFAULT);
@@ -60,17 +60,29 @@ export function drawCurrentPosition(lat : number, lon : number) {
     }
 }
 
-function createRecordMarker(record : PublicRecord) {
-    return;
+export function createRecordMarker(record : PublicRecord) {
+    const marker = L.marker({lat: record.lat, lng: record.lon}, {
+        interactive: true,
+        icon: markerIcon
+    }).addTo(map);
+    marker.on("click", () => handleMarkerClick(marker));
 }
 
+function handleMarkerClick(marker : L.Marker) {
+    L.popup({
+        content: "This is a thingy",
+    }).setLatLng(marker.getLatLng());
+}
+
+export let lastClick : L.LeafletMouseEvent;
 
 function handleClick(clickEvent : L.LeafletMouseEvent) {
     switch (get(interactivityState)) {
         case INTERACTIVITY_STATES.ADD: {
-            const marker = L.marker(clickEvent.latlng, {icon: markerIcon}).addTo(map);
+            L.marker(clickEvent.latlng, {icon: markerIcon}).addTo(map); // This needs to be removed later... but how?
             interactivityState.set(INTERACTIVITY_STATES.ADD_DETAILS);
             break;
         }
     }
+    lastClick = clickEvent;
 }

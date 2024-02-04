@@ -12,6 +12,11 @@
         return result;
     }
 
+    function hideToolbar(event : MouseEvent & {currentTarget: EventTarget & HTMLButtonElement}) {
+        if (event.currentTarget.parentElement)
+            event.currentTarget.parentElement.style.minWidth = '0';
+        showToolbar = false;
+    }
 </script>
 <style>
     .toolbar {
@@ -30,17 +35,16 @@
     }
     
     .toolbar-item {
-        border: 3px dotted purple;
         cursor: pointer;
     }
 </style>
 
 <div transition:slideMinWidth={{duration: 300, axis: "x"}} class="toolbar">
-    <button on:click={(evn) => {if (evn.currentTarget.parentElement) evn.currentTarget.parentElement.style.minWidth = '0'; showToolbar = false}} class="toolbar-item"> 
+    <button on:click={hideToolbar} class="toolbar-item"> 
         <!-- Temporary -->
         <h1>Go back</h1>
     </button>
-    <button on:click={() => {$interactivityState = INTERACTIVITY_STATES.ADD}} class="toolbar-item">
+    <button on:click={(event) => {$interactivityState = INTERACTIVITY_STATES.ADD; hideToolbar(event);}} class="toolbar-item">
         <h1>Add Site</h1>
     </button>
     <button class="toolbar-item">

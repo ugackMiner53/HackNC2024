@@ -51,7 +51,7 @@ let data: {
   images: { [x: UUID]: Image };
 };
 function trySave() {
-  if (needSave) setTimeout(() => save(), 60_000);
+  if (needSave) setTimeout(() => save(), 1 /*60_000*/);
   needSave = false;
 }
 function save() {
@@ -161,8 +161,8 @@ export class DataBase {
     return getRecord(uuid);
   }
   static async addRecord(lat: number, lon: number, name: string, desc: string): Promise<PublicRecord | undefined> {
-    if (!validateText(name)) return;
-    if (!validateText(desc)) return;
+    if (!await validateText(name)) return;
+    if (!await validateText(desc)) return;
     lat = eucMod(lat, 180);
     lon = eucMod(lon, 360);
     const uuid = randomUUID();
@@ -201,7 +201,7 @@ export class DataBase {
   static async updateRecordName(uuid: UUID | PublicRecord, name: string): Promise<PublicRecord | undefined> {
     const r = getRecord(uuid);
     if (r === undefined) return;
-    if (!validateText(name)) return;
+    if (!await validateText(name)) return;
     r.name = name;
     trySave();
     return r;
@@ -209,7 +209,7 @@ export class DataBase {
   static async updateRecordDesc(uuid: UUID | PublicRecord, desc: string): Promise<PublicRecord | undefined> {
     const r = getRecord(uuid);
     if (r === undefined) return;
-    if (!validateText(desc)) return;
+    if (!await validateText(desc)) return;
     r.desc = desc;
     trySave();
     return r;
@@ -219,7 +219,7 @@ export class DataBase {
     return getComment(uuid);
   }
   static async addComment(record: PublicRecord, comment: string): Promise<PublicComment | undefined> {
-    if (!validateText(comment)) return;
+    if (!await validateText(comment)) return;
     const c: Comment = { uuid: randomUUID(), text: comment, ruuid: record.uuid };
     record.comments.push(c.uuid);
     data.comments[c.uuid] = c;
@@ -241,7 +241,7 @@ export class DataBase {
   }
   static async uploadImage(img: Buffer, ext: string): Promise<PublicImage | undefined> {
     if (!/^\.\S{3,4}$/.test(ext)) return;
-    if (!validateImage(img)) return;
+    if (!await validateImage(img)) return;
     const uuid = randomUUID();
     await writeFileP(IMAGE_PATH + uuid + ext, img);
     const i = {
@@ -279,8 +279,8 @@ export class DataBase {
     return getRoute(uuid);
   }
   static async addRoute(name: string, desc: string, ...records: PublicRecord[]): Promise<PublicRoute | undefined> {
-    if (!validateText(name)) return;
-    if (!validateText(desc)) return;
+    if (!await validateText(name)) return;
+    if (!await validateText(desc)) return;
     const uuid = randomUUID();
     const r: Route = {
       uuid,
@@ -328,7 +328,7 @@ export class DataBase {
   static async updateRouteName(uuid: UUID | PublicRoute, name: string): Promise<PublicRoute | undefined> {
     const r = getRoute(uuid);
     if (r === undefined) return;
-    if (!validateText(name)) return;
+    if (!await validateText(name)) return;
     r.name = name;
     trySave();
     return r;
@@ -336,7 +336,7 @@ export class DataBase {
   static async updateRouteDesc(uuid: UUID | PublicRoute, desc: string): Promise<PublicRoute | undefined> {
     const r = getRoute(uuid);
     if (r === undefined) return;
-    if (!validateText(desc)) return;
+    if (!await validateText(desc)) return;
     r.desc = desc;
     trySave();
     return r;
