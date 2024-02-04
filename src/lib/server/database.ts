@@ -62,7 +62,7 @@ function load() {
   if (existsSync(STORAGE_PATH)) data = JSON.parse(readFileSync(STORAGE_PATH).toString());
   else {
     data = {
-      cells: new Array(180).fill(0).map((v) => new Array(360)),
+      cells: new Array(180).fill(0).map(() => new Array(360)),
       records: {},
       routes: {},
       comments: {},
@@ -253,7 +253,7 @@ export class DataBase {
     return img;
   }
   static async addImageBuffer(record: PublicRecord, img: Buffer, ext: string): Promise<PublicImage | undefined> {
-    let image = await DataBase.uploadImage(img, ext);
+    const image = await DataBase.uploadImage(img, ext);
     if (image === undefined) return;
     return DataBase.addImage(record, image);
   }
