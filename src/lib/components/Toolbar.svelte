@@ -5,12 +5,10 @@
     export let showToolbar : boolean;
 
     function slideMinWidth(node : HTMLElement, properties : SlideParams) {
-        // TODO: fix
-        node.style.minWidth = "0";
         const result = slide(node, properties);
         setTimeout(() => {
-            node.style.minWidth = "200px";
-        }, properties.duration ?? 0  - 5);
+            node.style.minWidth = '200px';
+        }, properties.duration ?? 0);
         return result;
     }
 
@@ -18,7 +16,8 @@
 <style>
     .toolbar {
         width: 20%;
-        min-width: 200px;
+        /* min-width: 200px; */
+        white-space: nowrap;
         max-width: 390px;
         height: 100%;
         background-color: white;
@@ -37,7 +36,7 @@
 </style>
 
 <div transition:slideMinWidth={{duration: 300, axis: "x"}} class="toolbar">
-    <button on:click={() => {showToolbar = false}} class="toolbar-item"> 
+    <button on:click={(evn) => {if (evn.currentTarget.parentElement) evn.currentTarget.parentElement.style.minWidth = '0'; showToolbar = false}} class="toolbar-item"> 
         <!-- Temporary -->
         <h1>Go back</h1>
     </button>

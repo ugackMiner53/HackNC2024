@@ -18,7 +18,6 @@ let L : typeof import("leaflet");
 
 export async function importLeaflet() {
     L = await import("leaflet");
-    console.log(typeof L);
 }
 
 export function createMap(mapElement : HTMLDivElement) : L.Map {

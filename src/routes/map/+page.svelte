@@ -66,7 +66,7 @@
     <Toolbar bind:showToolbar={showToolbar} />
 {:else}
     <div transition:fade={{delay: 300, duration: 100}} class="menu">
-        <button on:click={() => {showToolbar = true;}}>&gt;</button>
+        <button on:click={() => {showToolbar = true}}>&gt;</button>
     </div>
 {/if}
 
