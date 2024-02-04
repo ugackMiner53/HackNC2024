@@ -24,9 +24,7 @@
 <p>&nbsp</p>
 <button class="buttons" type="button" on:click={() => goto("./contacts")}>Contact Us</button>
 <button class="buttons" type="button" on:click={() => goto("./about")}>About Us</button>
-
+<button class="buttons" type="button" on:click={() => goto("./map")}>Go to App</button>
 <p>Locations of places are at the button called Go to App</p>
 <img src={image} alt="National Museum of African American History and Culture" width = "50%" height = "50%">
 <p>&nbsp</p>
-<button on:click={() => goto("./map")}>Go to App</button>
-
