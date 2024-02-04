@@ -163,6 +163,8 @@ export async function createRoute() {
   get(currRoute).forEach((v) => v.setIcon(markerIcon));
   currRoute.set([]);
 
+  prompt('Route Created! Copy the code here:', data.uuid);
+
   setActiveRoute(data);
 }
 

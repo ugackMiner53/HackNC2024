@@ -257,6 +257,15 @@
             {/each}
         </ul>
         <button on:click={() => $interactivityState == INTERACTIVITY_STATES.ROUTING ? createRoute() : (setActiveRoute(undefined), $interactivityState = INTERACTIVITY_STATES.DEFAULT) } style="z-index: 5">{$interactivityState == INTERACTIVITY_STATES.ROUTING ? "Publish" : "End Route"}</button>
+
+        {#if $interactivityState == INTERACTIVITY_STATES.ROUTE_PLAYBACK}
+        
+        <div class="centerme"><h1 style="text-align: center; white-space: break-spaces">{activeRoute?.name}</h1></div>
+        
+        <div class="centerme">
+            <p class="record-description">{activeRoute?.desc}</p>
+        </div>
+        {/if}
     </Sidebar>
 {/if}
 
@@ -284,12 +293,15 @@
         }} class="toolbar-item">
             <h1>Routes</h1>
         </button>
-        <button on:click={(evn) => {
-            $interactivityState = INTERACTIVITY_STATES.ROUTE_PLAYBACK;
+        <button on:click={async (evn) => {
             hideToolbar(evn);
+            const routeUUID = prompt("Enter your Route Code");
+            const route = await (await fetch(`/api/route/${routeUUID}`)).json();
+            await setActiveRoute(route);
+            $interactivityState = INTERACTIVITY_STATES.ROUTE_PLAYBACK;
             showToolbar = false;
         }} class="toolbar-item">
-            <h1>Find Routes</h1>
+            <h1>Import Route</h1>
         </button>
         <button class="toolbar-item">
             <h1>About</h1>
