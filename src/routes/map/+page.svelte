@@ -188,6 +188,9 @@
       <p>no image</p>
     {/if}
     <p class="record-description">{$activeRecord.desc}</p>
+    <button on:click={() => ($interactivityState = INTERACTIVITY_STATES.VIEW_IMAGES)}
+      >VIEW THE IMAGES OF THE ACTIVE RECORD PLEASE DO NOT FORGET TO CHANGE TYTY</button
+    >
   </Sidebar>
 {:else}
   <div transition:fade={{ delay: 300, duration: 100 }} class="menu">
