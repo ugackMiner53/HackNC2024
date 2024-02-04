@@ -1,6 +1,6 @@
 // @ts-ignore
 import Perspective from 'perspective-api-client';
-import { PERSPECTIVE_API_KEY } from '$env/static/private';
+import {PERSPECTIVE_API_KEY} from '$env/static/private';
 
 type PPScore = {
   value: number;
