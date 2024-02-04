@@ -18,6 +18,8 @@
     h1 {font-size: 25px;}
     h2 {font-size: 20px;}
 </style>
+<body style="background-color:#ffcc33">
+</body>
 <h1 style="font-family:'Papyrus'">A Walk Through History</h1>
 <h2 style="font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif">You don't have to be in a museum to walk through history</h2>
 <br>
