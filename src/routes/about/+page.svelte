@@ -28,7 +28,7 @@
     </div>
     <div class="scroll strokeme">
         <h1>Inspiration</h1>
-        <p>Our inspiration for this project came from a statistical analysis we ran on the number of people who have visited the National Museum of African Art. 
+        <p>Our inspiration for this project came from a statistical analysis we ran on the number of people who have visited the Smithsonian National Museum of African Art. 
             <br><br>We have seen a scary downward trend and have attributed it to the fact that people prefer the ease of access of simply using their phone to find information and that Museums cost money. 
             <br><br>Our solution is to incorporate the fact people want to use their phones to read information, with the cost of 0$ to appreciate landmarks of black history. </p>
     </div>
