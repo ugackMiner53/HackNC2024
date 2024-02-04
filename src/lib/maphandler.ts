@@ -17,7 +17,7 @@ interface RecordMarker extends L.Marker {
 export const interactivityState = writable(INTERACTIVITY_STATES.DEFAULT);
 export const activeRecord: Writable<PublicRecord | undefined> = writable(undefined);
 export let map: L.Map;
-export let selectionMarker: L.Marker;
+export let selectionMarker: L.Marker | undefined;
 export let viewingImages: PublicImage[] | undefined;
 
 const records = new Set<UUID>();
@@ -99,6 +99,9 @@ export function createRecordMarker(record: PublicRecord) {
   marker.on('click', () => handleMarkerClick(marker));
   marker.addTo(map);
 
+  selectionMarker?.remove();
+  selectionMarker = undefined;
+
   records.add(record.uuid);
 }
 
@@ -111,10 +114,14 @@ export let lastClick: L.LeafletMouseEvent;
 function handleClick(clickEvent: L.LeafletMouseEvent) {
   switch (get(interactivityState)) {
     case INTERACTIVITY_STATES.ADD: {
-      selectionMarker = L.marker(clickEvent.latlng, {
-        icon: markerIcon,
-        opacity: 0.75
-      }).addTo(map); // This needs to be removed later... but how?
+      if (selectionMarker === undefined) {
+        selectionMarker = L.marker(clickEvent.latlng, {
+          icon: markerIcon,
+          opacity: 0.75
+        }).addTo(map);
+      } else {
+        selectionMarker.setLatLng(clickEvent.latlng);
+      }
       interactivityState.set(INTERACTIVITY_STATES.ADD_DETAILS);
       break;
     }

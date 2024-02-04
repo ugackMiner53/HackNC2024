@@ -178,12 +178,16 @@
       $activeRecord = undefined;
     }}
   >
-    <h1>{$activeRecord.name}</h1>
-    <p>{$activeRecord.desc}</p>
-
-    <button on:click={() => ($interactivityState = INTERACTIVITY_STATES.VIEW_IMAGES)}
-      >VIEW THE IMAGES OF THE ACTIVE RECORD PLEASE DO NOT FORGET TO CHANGE TYTY</button
-    >
+    <h1 class="record-name">{$activeRecord.name}</h1>
+    {#if $activeRecord.images != undefined && $activeRecord.images.length > 0}
+      {#await $activeRecord.images[Math.floor(Math.random() * $activeRecord.images.length)] then imageUUID}
+        <img class="record-image" src={`/images/bucket/${imageUUID}.png`} />
+        <p>woah image</p>
+      {/await}
+    {:else}
+      <p>no image</p>
+    {/if}
+    <p class="record-description">{$activeRecord.desc}</p>
   </Sidebar>
 {:else}
   <div transition:fade={{ delay: 300, duration: 100 }} class="menu">
@@ -231,6 +235,18 @@
 
   .toolbar-item {
     cursor: pointer;
+  }
+
+  .record-name {
+    position: fixed;
+  }
+
+  .record-description {
+    word-wrap: break-word;
+    width: 100%;
+  }
+
+  .record-image {
   }
 
   .imageview-container {
