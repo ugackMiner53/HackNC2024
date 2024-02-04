@@ -158,6 +158,11 @@
         {:else}
             <p>no image</p>
         {/if}
+        <form on:submit|preventDefault={(evn) => ($activeRecord !== undefined) && imageSubmitEvent(evn, $activeRecord.uuid)} enctype="multipart/form-data" method="post">
+            <label for="imageToUpload">Image to Upload:</label>
+            <input type="file" name="imageToUpload" id="imageToUpload" accept=".png" required>
+            <button type="submit">Submit</button>
+        </form>
         <p class="record-description">{$activeRecord.desc}</p>
     </Sidebar>
 {:else}
