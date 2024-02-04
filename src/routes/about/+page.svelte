@@ -69,4 +69,13 @@
         -1px 1px 0 #000,
         1px 1px 0 #000;  
     }
+    img {
+        transition:transform 0.25s ease;
+    }
+
+    img:hover {
+        -webkit-transform:scale(1.5);
+        transform:scale(1.5);
+        transform:translate(20%, -105%);
+    }
 </style>
