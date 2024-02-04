@@ -1,5 +1,5 @@
 import { get, writable, type Writable } from 'svelte/store';
-import type { PublicImage, PublicRecord } from './server/database';
+import type { PublicImage, PublicRecord, PublicRoute } from './server/database';
 import type { UUID } from 'crypto';
 
 export enum INTERACTIVITY_STATES {
@@ -7,7 +7,8 @@ export enum INTERACTIVITY_STATES {
   ADD,
   ADD_DETAILS,
   ADD_DETAILS_SUBMITTING,
-  VIEW_IMAGES
+  VIEW_IMAGES,
+  ROUTING
 }
 
 interface RecordMarker extends L.Marker {
@@ -25,6 +26,7 @@ const records = new Map<UUID, RecordMarker>();
 let markerIcon: L.Icon;
 let markerImportantIcon: L.Icon;
 let userCircle: L.CircleMarker;
+let currRoute: RecordMarker[] = [];
 
 let L: typeof import('leaflet');
 
@@ -54,25 +56,25 @@ export function createMap(mapElement: HTMLDivElement): L.Map {
 }
 
 export function createMarkerIcon() {
-    markerIcon = new L.Icon({
-        iconUrl: '/images/marker-icon-2x.png',
-        iconSize: [50 / 2, 82 / 2],
-        iconAnchor: [50 / 4, 82 / 2],
-        shadowSize: [0, 0]
-    });
-    markerImportantIcon = new L.Icon({
-        iconUrl: '/images/marker-important-icon-2x.png',
-        iconSize: [50 / 2, 82 / 2],
-        iconAnchor: [50 / 4, 82 / 2],
-        shadowSize: [0, 0]
-    });
+  markerIcon = new L.Icon({
+    iconUrl: '/images/marker-icon-2x.png',
+    iconSize: [50 / 2, 82 / 2],
+    iconAnchor: [50 / 4, 82 / 2],
+    shadowSize: [0, 0]
+  });
+  markerImportantIcon = new L.Icon({
+    iconUrl: '/images/marker-important-icon-2x.png',
+    iconSize: [50 / 2, 82 / 2],
+    iconAnchor: [50 / 4, 82 / 2],
+    shadowSize: [0, 0]
+  });
 
-    let oldRecord : PublicRecord | undefined;
-    activeRecord.subscribe((valid) => {
-        if (oldRecord !== undefined) records.get(oldRecord!.uuid)?.setIcon(markerIcon);
-        if (valid !== undefined) records.get(valid!.uuid)?.setIcon(markerImportantIcon);
-        oldRecord = valid;
-    })
+  let oldRecord: PublicRecord | undefined;
+  activeRecord.subscribe((valid) => {
+    if (oldRecord !== undefined) records.get(oldRecord!.uuid)?.setIcon(markerIcon);
+    if (valid !== undefined) records.get(valid!.uuid)?.setIcon(markerImportantIcon);
+    oldRecord = valid;
+  });
 }
 
 export function drawCurrentPosition(lat: number, lon: number) {
@@ -119,8 +121,11 @@ export function createRecordMarker(record: PublicRecord) {
 }
 
 function handleMarkerClick(marker: RecordMarker) {
-//   if (get(activeRecord) !== undefined) records.get(get(activeRecord)!.uuid)?.setIcon(markerIcon);
-//   marker.setIcon(markerImportantIcon);
+  if (get(interactivityState) === INTERACTIVITY_STATES.ROUTING) {
+    currRoute.push(marker);
+    marker.setIcon(markerImportantIcon);
+    return;
+  }
   activeRecord.set(marker._record);
 }
 
@@ -142,4 +147,16 @@ function handleClick(clickEvent: L.LeafletMouseEvent) {
     }
   }
   lastClick = clickEvent;
+}
+
+export async function createRoute() {
+  interactivityState.set(INTERACTIVITY_STATES.DEFAULT);
+  if (currRoute.length === 0) return;
+  const data: PublicRoute = await (
+    await fetch(
+      `/api/route?name=${prompt('name')}&desc=${prompt('desc')}&recs=${currRoute.map((v) => v._record.uuid).join(',')}`
+    )
+  ).json();
+  currRoute.forEach((v) => v.setIcon(markerIcon));
+  currRoute = [];
 }

@@ -11,11 +11,12 @@
     createRecordMarker,
     lastClick,
     activeRecord,
-    viewingImages
+    viewingImages,
+    createRoute
   } from '$lib/maphandler';
   import Modal from '$lib/components/Modal.svelte';
-  import type { UUID } from "crypto";
-    import UploadButton from '$lib/components/UploadButton.svelte';
+  import type { UUID } from 'crypto';
+  import UploadButton from '$lib/components/UploadButton.svelte';
 
   let showToolbar = false;
 
@@ -67,58 +68,79 @@
     }
   }
 
-  async function submitComment(event : SubmitEvent, uuid : UUID) {    
+  async function submitComment(event: SubmitEvent, uuid: UUID) {
     const searchParams = new URLSearchParams();
-    searchParams.set("id", uuid);
-    searchParams.set("text", new FormData(<HTMLFormElement>event.target).get("comment") as string);
+    searchParams.set('id', uuid);
+    searchParams.set('text', new FormData(<HTMLFormElement>event.target).get('comment') as string);
     const comment = await (
-        await fetch('/api/comment?' + searchParams, {
-            method: 'POST'
-        })
-    ).json(); 
-    
+      await fetch('/api/comment?' + searchParams, {
+        method: 'POST'
+      })
+    ).json();
+
     if (comment.uuid) {
-        comments.push(comment);
-        comments = comments;
-        (<HTMLInputElement>(<HTMLFormElement>event.target).querySelector("input#commentInput")).value = "";
+      comments.push(comment);
+      comments = comments;
+      (<HTMLInputElement>(<HTMLFormElement>event.target).querySelector('input#commentInput')).value = '';
     } else {
-        (<HTMLInputElement>(<HTMLFormElement>event.target).querySelector("input#commentInput")).value = "Your content has been blocked for inappropriate or derogatory language.";
+      (<HTMLInputElement>(<HTMLFormElement>event.target).querySelector('input#commentInput')).value =
+        'Your content has been blocked for inappropriate or derogatory language.';
     }
 
     return false;
-}
+  }
 
-    async function getAllComments(): Promise<PublicComment[]> {
-        if ($activeRecord?.comments.length === 0) return [];
-        return comments = await (await fetch(`/api/comment?ids=${$activeRecord?.comments.join(',')}`)).json();
-    }
+  async function getAllComments(): Promise<PublicComment[]> {
+    if ($activeRecord?.comments.length === 0) return [];
+    return (comments = await (await fetch(`/api/comment?ids=${$activeRecord?.comments.join(',')}`)).json());
+  }
 
-    function hideToolbar(event : MouseEvent & {currentTarget: EventTarget & HTMLButtonElement}) {
-        if (event.currentTarget.parentElement)
-            event.currentTarget.parentElement.style.minWidth = '0';
-    }
+  function hideToolbar(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
+    if (event.currentTarget.parentElement) event.currentTarget.parentElement.style.minWidth = '0';
+  }
 
-    async function loadImages(imgs: UUID[]): Promise<PublicImage[]> {
-        return (await fetch(`/api/image/?ids=${imgs.join(',')}`)).json();
-    }
+  async function loadImages(imgs: UUID[]): Promise<PublicImage[]> {
+    return (await fetch(`/api/image/?ids=${imgs.join(',')}`)).json();
+  }
 </script>
 
-{#if $interactivityState == INTERACTIVITY_STATES.ADD_DETAILS || $interactivityState == INTERACTIVITY_STATES.ADD_DETAILS_SUBMITTING }
-    <Modal closeButton={true} on:close={() => {$interactivityState = INTERACTIVITY_STATES.DEFAULT; profanityTriggered=false;}}>
-        <h2>Enter the Landmark!</h2>
+{#if $interactivityState == INTERACTIVITY_STATES.ADD_DETAILS || $interactivityState == INTERACTIVITY_STATES.ADD_DETAILS_SUBMITTING}
+  <Modal
+    closeButton={true}
+    on:close={() => {
+      $interactivityState = INTERACTIVITY_STATES.DEFAULT;
+      profanityTriggered = false;
+    }}
+  >
+    <h2>Enter the Landmark!</h2>
 
-        <label for="name">Name</label>
-        <input disabled={$interactivityState == INTERACTIVITY_STATES.ADD_DETAILS_SUBMITTING} type="text" bind:value={recordName} name="name">
+    <label for="name">Name</label>
+    <input
+      disabled={$interactivityState == INTERACTIVITY_STATES.ADD_DETAILS_SUBMITTING}
+      type="text"
+      bind:value={recordName}
+      name="name"
+    />
 
-        <label for="desc">Description</label>
-        <textarea disabled={$interactivityState == INTERACTIVITY_STATES.ADD_DETAILS_SUBMITTING} name="desc" bind:value={recordDesc} />
+    <label for="desc">Description</label>
+    <textarea
+      disabled={$interactivityState == INTERACTIVITY_STATES.ADD_DETAILS_SUBMITTING}
+      name="desc"
+      bind:value={recordDesc}
+    />
 
-        {#if profanityTriggered}
-            <p class="profanity-warning" transition:fade={{duration:500}}>Your content has been blocked for inappropriate or derogatory language.</p>
-        {/if}
+    {#if profanityTriggered}
+      <p class="profanity-warning" transition:fade={{ duration: 500 }}>
+        Your content has been blocked for inappropriate or derogatory language.
+      </p>
+    {/if}
 
-        <button disabled={$interactivityState == INTERACTIVITY_STATES.ADD_DETAILS_SUBMITTING} on:click={() => submitRecord(recordName, recordDesc, lastClick.latlng.lat, lastClick.latlng.lng)}>{$interactivityState === INTERACTIVITY_STATES.ADD_DETAILS ? "Submit" : "Loading..."}</button>
-    </Modal>
+    <button
+      disabled={$interactivityState == INTERACTIVITY_STATES.ADD_DETAILS_SUBMITTING}
+      on:click={() => submitRecord(recordName, recordDesc, lastClick.latlng.lat, lastClick.latlng.lng)}
+      >{$interactivityState === INTERACTIVITY_STATES.ADD_DETAILS ? 'Submit' : 'Loading...'}</button
+    >
+  </Modal>
 {/if}
 
 {#if $interactivityState == INTERACTIVITY_STATES.VIEW_IMAGES}
@@ -127,10 +149,11 @@
     notScuffed={false}
     on:close={() => {
       $interactivityState = INTERACTIVITY_STATES.DEFAULT;
-    }}>
+    }}
+  >
     <div class="imageview-container">
       <button on:click={() => currImageI--} class="image-scroll-l"><span>〈</span></button>
-    <section class="image-container" style="flex-grow: 1;">
+      <section class="image-container" style="flex-grow: 1;">
         <img
           src={$viewingImages === undefined ? '' : $viewingImages[currImageI].path}
           class="image-image"
@@ -139,7 +162,7 @@
       </section>
       <button on:click={() => currImageI++} class="image-scroll-r"><span>〉</span></button>
     </div>
-</Modal>
+  </Modal>
 
   {#if currImageI === 0}
     <style>
@@ -157,62 +180,101 @@
   {/if}
 {/if}
 
-{#if showToolbar && $activeRecord === undefined}
-    <Sidebar hideSidebar={(evn) => {hideToolbar(evn); showToolbar = false;}}>
-        <button on:click={(evn) => {$interactivityState = INTERACTIVITY_STATES.ADD; hideToolbar(evn); showToolbar = false;}} class="toolbar-item">
-            <h1>Add Site</h1>
-        </button>
-        <button class="toolbar-item">
-            <h1>Map</h1>
-        </button>
-        <button class="toolbar-item">
-            <h1>Routes</h1>
-        </button>
-    </Sidebar>
-{:else if $activeRecord !== undefined}
-    <Sidebar hideSidebar={(evn) => {hideToolbar(evn); $activeRecord = undefined;}}>
-        <div class="centerme"><h1>{$activeRecord.name}</h1></div>
-        {#if $activeRecord.images !== undefined && $activeRecord.images.length > 0}
-            {#await $activeRecord.images[Math.floor(Math.random()*$activeRecord.images.length)] then imageUUID}
-                <button on:click={async () => {
-                    if ($activeRecord === undefined) 
-                        return; 
-                    $viewingImages = await loadImages($activeRecord.images);
-                    $interactivityState = INTERACTIVITY_STATES.VIEW_IMAGES;
-                }} class="image-container" style="cursor: pointer">
-                    <img class="image-image" src={`/images/bucket/${imageUUID}.png`} alt="">
-                    <UploadButton />
-                </button>
-            {/await}
-        {:else}
-            <div class="centerme image-container">
-                <p style="padding: 50px 0; user-select: none;">No Images Available</p>
-                <UploadButton />
-            </div>
-        {/if}
-        <div class="centerme"><p class="record-description">{$activeRecord.desc}</p></div>
+{#if $interactivityState == INTERACTIVITY_STATES.ROUTING}
+  <button on:click={() => createRoute()} style="z-index: 5">End Route</button>
+{/if}
 
-        <div class="image-container">
-            <form method="post" on:submit|preventDefault={evn => $activeRecord !== undefined && (submitComment(evn, $activeRecord.uuid), false)}>
-                <div style="position: flex; flex-direction: row; justify-content: center; align-items: center">
-                    <input style="flex-grow: 1" type="text" placeholder="Tell us about your experiences here..." name="comment" id="commentInput" autocomplete="off">
-                    <button style="padding: 5px" type="submit">Post</button>
-                </div>
-            </form>
+{#if showToolbar && $activeRecord === undefined}
+  <Sidebar
+    hideSidebar={(evn) => {
+      hideToolbar(evn);
+      showToolbar = false;
+    }}
+  >
+    <button
+      on:click={(evn) => {
+        $interactivityState = INTERACTIVITY_STATES.ADD;
+        hideToolbar(evn);
+        showToolbar = false;
+      }}
+      class="toolbar-item"
+    >
+      <h1>Add Site</h1>
+    </button>
+    <button class="toolbar-item">
+      <h1>Map</h1>
+    </button>
+    <button class="toolbar-item">
+      <h1>Routes</h1>
+    </button>
+  </Sidebar>
+{:else if $activeRecord !== undefined}
+  <Sidebar
+    hideSidebar={(evn) => {
+      hideToolbar(evn);
+      $activeRecord = undefined;
+    }}
+  >
+    <div class="centerme"><h1>{$activeRecord.name}</h1></div>
+    {#if $activeRecord.images !== undefined && $activeRecord.images.length > 0}
+      {#await $activeRecord.images[Math.floor(Math.random() * $activeRecord.images.length)] then imageUUID}
+        <button
+          on:click={async () => {
+            if ($activeRecord === undefined) return;
+            $viewingImages = await loadImages($activeRecord.images);
+            $interactivityState = INTERACTIVITY_STATES.VIEW_IMAGES;
+          }}
+          class="image-container"
+          style="cursor: pointer"
+        >
+          <img class="image-image" src={`/images/bucket/${imageUUID}.png`} alt="" />
+          <UploadButton />
+        </button>
+      {/await}
+    {:else}
+      <div class="centerme image-container">
+        <p style="padding: 50px 0; user-select: none;">No Images Available</p>
+        <UploadButton />
+      </div>
+    {/if}
+    <div class="centerme"><p class="record-description">{$activeRecord.desc}</p></div>
+
+    <div class="image-container">
+      <form
+        method="post"
+        on:submit|preventDefault={(evn) =>
+          $activeRecord !== undefined && (submitComment(evn, $activeRecord.uuid), false)}
+      >
+        <div style="position: flex; flex-direction: row; justify-content: center; align-items: center">
+          <input
+            style="flex-grow: 1"
+            type="text"
+            placeholder="Tell us about your experiences here..."
+            name="comment"
+            id="commentInput"
+            autocomplete="off"
+          />
+          <button style="padding: 5px" type="submit">Post</button>
         </div>
-        
-        <ul class="comment-list">
-            {#await getAllComments() then}
-                {#each comments as comment}
-                    <li class="comment">{comment.text}</li>
-                {/each}
-            {/await}
-        </ul>
-    </Sidebar>
-{:else}
-    <div transition:fade={{delay: 300, duration: 100}} class="menu">
-        <button on:click={() => {showToolbar = true}}>&gt;</button>
+      </form>
     </div>
+
+    <ul class="comment-list">
+      {#await getAllComments() then}
+        {#each comments as comment}
+          <li class="comment">{comment.text}</li>
+        {/each}
+      {/await}
+    </ul>
+  </Sidebar>
+{:else}
+  <div transition:fade={{ delay: 300, duration: 100 }} class="menu">
+    <button
+      on:click={() => {
+        showToolbar = true;
+      }}>&gt;</button
+    >
+  </div>
 {/if}
 
 <!-- Search bar -->
@@ -278,7 +340,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    position:relative;
+    position: relative;
     background-color: transparent;
     border: none;
   }
