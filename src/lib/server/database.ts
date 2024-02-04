@@ -247,7 +247,7 @@ export class DataBase {
     const i = {
       uuid,
       ext,
-      path: IMAGE_PATH + uuid + ext
+      path: IMAGE_PATH.slice('./static'.length) + uuid + ext
     };
     data.images[uuid] = i;
     trySave();

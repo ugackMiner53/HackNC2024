@@ -7,6 +7,7 @@
     import { fade } from "svelte/transition";
     import { INTERACTIVITY_STATES, interactivityState, createRecordMarker, lastClick, activeRecord } from "$lib/maphandler";
     import Modal from "$lib/components/Modal.svelte";
+    import type { UUID } from "crypto";
 
     let showToolbar = false;
 
@@ -53,6 +54,15 @@
     function hideToolbar(event : MouseEvent & {currentTarget: EventTarget & HTMLButtonElement}) {
         if (event.currentTarget.parentElement)
             event.currentTarget.parentElement.style.minWidth = '0';
+    }
+
+    async function imageSubmitEvent(event : SubmitEvent, uuid: UUID) {
+        const formData = new FormData(<HTMLFormElement>event.target);
+        const response = await fetch(`/api/image?id=${uuid}`, {
+            method: "POST",
+            body: formData
+        })
+        return false;
     }
 </script>
 
@@ -148,6 +158,11 @@
         {:else}
             <p>no image</p>
         {/if}
+        <form on:submit|preventDefault={(evn) => ($activeRecord !== undefined) && imageSubmitEvent(evn, $activeRecord.uuid)} enctype="multipart/form-data" method="post">
+            <label for="imageToUpload">Image to Upload:</label>
+            <input type="file" name="imageToUpload" id="imageToUpload" accept=".png" required>
+            <button type="submit">Submit</button>
+        </form>
         <p class="record-description">{$activeRecord.desc}</p>
     </Sidebar>
 {:else}

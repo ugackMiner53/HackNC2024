@@ -5,11 +5,11 @@ import { error, json } from '@sveltejs/kit';
 export async function POST({ url, request }) {
   const formData = Object.fromEntries(await request.formData());
 
-  if (!(formData.fileToUpload as File).name || (formData.fileToUpload as File).name === 'undefined')
+  if (!formData.imageToUpload || !(formData.imageToUpload as File).name || (formData.imageToUpload as File).name === 'undefined')
     return error(400, { message: 'no file uploaded' });
 
-  const { fileToUpload } = formData as { fileToUpload: File };
-  const img = await DataBase.uploadImage(Buffer.from(await fileToUpload.arrayBuffer()), '.png');
+  const { imageToUpload } = formData as { imageToUpload: File };
+  const img = await DataBase.uploadImage(Buffer.from(await imageToUpload.arrayBuffer()), '.png');
   if (!img) return error(400, { message: 'content mod check' });
 
   const id = url.searchParams.get('id');
