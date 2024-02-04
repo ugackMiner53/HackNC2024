@@ -8,10 +8,10 @@
 <div class='bg'>
 </div>
 <div class="bgtext strokeme">
-    <h1>About Us</h1>
     <div style="display:flex; justify-content:flex-end; width:100%; padding:-10;">
-        <button type="button" on:click={navigateToLandingPage} class="back-button">Back to Landing Page</button>
+        <button type="button" on:click={navigateToLandingPage} class="back-button">Back to Home Page</button>
     </div>
+    <h1>About Us</h1>
     <div class="strokeme">
         <p>Welcome to “Walk Through History”, a groundbreaking web app that seamlessly integrates cutting-edge technologies <br>
         such as Svelte and OpenStreetMap to redefine the way we engage with Black history. <br><br> 
@@ -54,7 +54,7 @@
         text-align: center;
     }
     button {
-      background-color: #007bff;
+      background-color: #69bb22;
       color: #fff;
       padding: 10px 15px;
       cursor: pointer;

@@ -50,7 +50,6 @@
       
     }
 </style>
-<button on:click={navigateToLandingPage} class="back-button">Back to Landing Page</button>
 <div class="background">
     <form on:submit|preventDefault={handleSubmit}>
         <label for="name">Name:</label>
@@ -63,6 +62,6 @@
         <textarea id="comment" bind:value={message} rows="4" required></textarea>
       
         <button type="submit">Submit</button>
-    
+        <button on:click={navigateToLandingPage} class="back-button">Back to Home Page</button>
     </form>
 </div>
