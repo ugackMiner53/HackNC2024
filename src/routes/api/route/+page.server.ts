@@ -4,8 +4,8 @@ import { error, json } from '@sveltejs/kit';
 import type { UUID } from 'crypto';
 
 export function GET({ url }) {
-  const lat = Number(url.searchParams.get('lat'));
-  const lon = Number(url.searchParams.get('lon'));
+  const lat = Number(url.searchParams.get('lat')) + 90;
+  const lon = Number(url.searchParams.get('lon')) + 180;
 
   if (Number.isNaN(lat) || Number.isNaN(lon)) return error(400, { message: 'invalid param' });
 
