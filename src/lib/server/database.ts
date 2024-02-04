@@ -145,7 +145,7 @@ async function validateText(txt: string): Promise<boolean> {
 }
 export class DataBase {
   static getNearest(lat: number, lon: number): PublicRecord | undefined {
-    return this.getNearby(lat, lon)[0];
+    return DataBase.getNearby(lat, lon)[0];
   }
   static getNearby(lat: number, lon: number, filter?: (record: PublicRecord) => boolean): PublicRecord[] {
     let arr = getNearbyRecords(lat, lon);
@@ -171,6 +171,7 @@ export class DataBase {
       routes: []
     };
     data.records[uuid] = record;
+    trySave();
     return record;
   }
   static deleteRecord(uuid: UUID | PublicRecord): PublicRecord | undefined {
@@ -186,6 +187,7 @@ export class DataBase {
     });
     rec.comments.forEach((v) => DataBase.deleteComment(v));
     rec.images.forEach((v) => DataBase.deleteImage(v));
+    trySave();
     return rec;
   }
   static async updateRecordName(uuid: UUID | PublicRecord, name: string): Promise<PublicRecord | undefined> {
@@ -193,6 +195,7 @@ export class DataBase {
     if (r === undefined) return;
     if (!validateText(name)) return;
     r.name = name;
+    trySave();
     return r;
   }
   static async updateRecordDesc(uuid: UUID | PublicRecord, desc: string): Promise<PublicRecord | undefined> {
@@ -200,6 +203,7 @@ export class DataBase {
     if (r === undefined) return;
     if (!validateText(desc)) return;
     r.desc = desc;
+    trySave();
     return r;
   }
 
@@ -211,6 +215,7 @@ export class DataBase {
     const c: Comment = { uuid: randomUUID(), text: comment, ruuid: record.uuid };
     record.comments.push(c.uuid);
     data.comments[c.uuid] = c;
+    trySave();
     return c;
   }
   static deleteComment(uuid: UUID | PublicComment): PublicComment | undefined {
@@ -219,6 +224,7 @@ export class DataBase {
     const com = data.comments[u];
     delete data.comments[u];
     if (com.ruuid !== undefined && getRecord(com.ruuid)) delArr(getRecord(com.ruuid)!.comments, u);
+    trySave();
     return com;
   }
 
@@ -236,16 +242,18 @@ export class DataBase {
       path: IMAGE_PATH + uuid + ext
     };
     data.images[uuid] = i;
+    trySave();
     return i;
   }
   static addImage(record: PublicRecord, img: PublicImage): PublicImage | undefined {
     if (img.ruuid !== undefined) return;
     record.images.push(img.uuid);
     (img as Image).ruuid = record.uuid;
+    trySave();
     return img;
   }
   static async addImageBuffer(record: PublicRecord, img: Buffer, ext: string): Promise<PublicImage | undefined> {
-    let image = await this.uploadImage(img, ext);
+    let image = await DataBase.uploadImage(img, ext);
     if (image === undefined) return;
     return DataBase.addImage(record, image);
   }
@@ -255,9 +263,13 @@ export class DataBase {
     const img = data.images[u];
     delete data.images[u];
     if (img.ruuid !== undefined && getRecord(img.ruuid)) delArr(getRecord(img.ruuid)!.images, u);
+    trySave();
     return img;
   }
 
+  static getRoute(uuid: UUID | PublicRoute): PublicRoute | undefined {
+    return getRoute(uuid);
+  }
   static async addRoute(name: string, desc: string, ...records: PublicRecord[]): Promise<PublicRoute | undefined> {
     if (!validateText(name)) return;
     if (!validateText(desc)) return;
@@ -270,6 +282,7 @@ export class DataBase {
     };
     data.routes[r.uuid] = r;
     records.forEach((v) => v.routes.push(r.uuid));
+    trySave();
     return r;
   }
   static deleteRoute(uuid: UUID | PublicRoute): PublicRoute | undefined {
@@ -282,6 +295,7 @@ export class DataBase {
       if (r === undefined) return;
       delArr(r.routes, u);
     });
+    trySave();
     return rou;
   }
   static addToRoute(route: UUID | PublicRoute, record: UUID | PublicRecord, index?: number): boolean {
@@ -291,6 +305,7 @@ export class DataBase {
     rec.routes.push(rou.uuid);
     if (index === undefined) index = rou.nodes.length;
     rou.nodes.splice(index, 0, rec.uuid);
+    trySave();
     return true;
   }
   static deleteFromRoute(route: UUID | PublicRoute, record: UUID | PublicRecord): boolean {
@@ -299,6 +314,7 @@ export class DataBase {
     if (rou === undefined || rec === undefined) return false;
     const a = delArr(rec.routes, rou.uuid);
     const b = delArr(rou.nodes, rec.uuid);
+    trySave();
     return a || b;
   }
   static async updateRouteName(uuid: UUID | PublicRoute, name: string): Promise<PublicRoute | undefined> {
@@ -306,6 +322,7 @@ export class DataBase {
     if (r === undefined) return;
     if (!validateText(name)) return;
     r.name = name;
+    trySave();
     return r;
   }
   static async updateRouteDesc(uuid: UUID | PublicRoute, desc: string): Promise<PublicRoute | undefined> {
@@ -313,6 +330,7 @@ export class DataBase {
     if (r === undefined) return;
     if (!validateText(desc)) return;
     r.desc = desc;
+    trySave();
     return r;
   }
 }
