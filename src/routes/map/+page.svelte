@@ -90,6 +90,20 @@
     .toolbar-item {
         cursor: pointer;
     }
+
+    .record-name {
+        position: fixed;
+
+    }
+
+    .record-description {
+        word-wrap: break-word;
+        width: 100%;
+    }
+
+    .record-image {
+
+    }
 </style>
 
 {#if $interactivityState == INTERACTIVITY_STATES.ADD_DETAILS || $interactivityState == INTERACTIVITY_STATES.ADD_DETAILS_SUBMITTING }
@@ -125,8 +139,16 @@
     </Sidebar>
 {:else if $activeRecord !== undefined}
     <Sidebar hideSidebar={(evn) => {hideToolbar(evn); $activeRecord = undefined;}}>
-        <h1>{$activeRecord.name}</h1>
-        <p>{$activeRecord.desc}</p>
+        <h1 class="record-name">{$activeRecord.name}</h1>
+        {#if $activeRecord.images != undefined && $activeRecord.images.length > 0}
+            {#await $activeRecord.images[Math.floor(Math.random()*$activeRecord.images.length)] then imageUUID}
+                <img class="record-image" src={`/images/bucket/${imageUUID}.png`}>
+                <p>woah image</p>
+            {/await}
+        {:else}
+            <p>no image</p>
+        {/if}
+        <p class="record-description">{$activeRecord.desc}</p>
     </Sidebar>
 {:else}
     <div transition:fade={{delay: 300, duration: 100}} class="menu">

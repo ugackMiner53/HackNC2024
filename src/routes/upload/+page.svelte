@@ -1,31 +1,29 @@
 <script lang="ts">
-  import { enhance } from '$app/forms';
-  import type { ActionData } from './$types';
+    async function formSubmitEvent(event : SubmitEvent) {
+        event.preventDefault();
 
-  const goodExt = ['.jpg', '.jpeg', '.png', '.webp'];
+        const form = <HTMLFormElement>event.target;
+        const formData = new FormData(form);
 
-  export let form: ActionData;
+        const fileInput = <HTMLInputElement>document.getElementById("fileToUpload");
+
+        if (fileInput.files == null) return;
+
+        console.log(formData.get("fileToUpload"));
+
+        const response = await fetch(`/api/image?id=${"dcb66720-c0ac-41b3-adfa-339f294cc2e7"}`, {
+            method: "POST",
+            body: formData
+        })
+
+        console.log(response);
+        return false;
+    }
+
 </script>
 
-<svelte:head>
-  <title>SvelteKit file upload</title>
-</svelte:head>
 
-<main>
-  <h1>upload</h1>
-
-  <form method="post" use:enhance enctype="multipart/form-data">
-    <label for="file">Upload your file</label>
-    <input type="file" id="file" name="fileToUpload" accept={goodExt.join(',')} required />
-
+<form on:submit={formSubmitEvent} enctype="multipart/form-data" method="post">
+    <input type="file" name="fileToUpload" id="fileToUpload" accept=".png" required>
     <button type="submit">Submit</button>
-  </form>
-
-  {#if form?.error}
-    boo
-  {/if}
-
-  {#if form?.success}
-    yay
-  {/if}
-</main>
+</form>

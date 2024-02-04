@@ -9,7 +9,7 @@ export async function POST({ url, request }) {
     return error(400, { message: 'no file uploaded' });
 
   const { fileToUpload } = formData as { fileToUpload: File };
-  const img = await DataBase.uploadImage(Buffer.from(await fileToUpload.arrayBuffer()), '.img');
+  const img = await DataBase.uploadImage(Buffer.from(await fileToUpload.arrayBuffer()), '.png');
   if (!img) return error(400, { message: 'content mod check' });
 
   const id = url.searchParams.get('id');

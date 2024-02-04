@@ -39,7 +39,7 @@ export type PublicImage = Readonly<Image>;
 
 // trust trust
 const STORAGE_PATH: string = './data.json';
-const IMAGE_PATH: string = './bucket/';
+const IMAGE_PATH: string = './static/images/bucket/';
 const THRESHOLD = 0.5;
 let needSave: boolean = true;
 
