@@ -1,64 +1,89 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import { fade } from "svelte/transition";
+  import { createEventDispatcher } from 'svelte';
+  import { fade } from 'svelte/transition';
 
-    export let closeButton = false;
-    
-    const dispatch = createEventDispatcher();
+  export let closeButton = false;
+  export let notScuffed = true;
 
+  const dispatch = createEventDispatcher();
 </script>
 
-<style>
+{#if notScuffed}
+  <style>
     .background {
-        position: absolute;
-        top: 0;
-        left: 0;
-        z-index: 5;
-        background-color: rgba(0.25, 0.25, 0.25, 0.25);
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        user-select: none;
+      background-color: rgba(0.25, 0.25, 0.25, 0.25);
     }
-
-    .modal {
-        background-color: white;
-        width: 60%;
-        height: 60%;
-        justify-content: space-evenly;
-        align-items: center;
-        display: flex;
-        border-radius: 18px;
-        flex-direction: column;
-        position: relative;
-    }
-
     .close {
-        color: gray;
-        font-size: large;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        cursor: pointer;
-        background: none;
-        border: none;
+      font-size: 30px;
     }
-
-    .close:hover {
-        color: darkgray;
+    .modal {
+      background-color: white;
+      width: 60%;
+      height: 60%;
     }
-
-    .close:active {
-        color: lightgray;
+  </style>
+{:else}
+  <style>
+    .background {
+      background-color: rgba(0.25, 0.25, 0.25, 0.75);
     }
+    .close {
+      font-size: 50px;
+    }
+    .modal {
+      background-color: transparent;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+{/if}
 
-</style>
-
-<div transition:fade={{duration: 500, delay: 30}} class="background">
-    <div class="modal">
-        <button class="close" on:click={() => dispatch("close")}>✖</button>
-        <slot />
-    </div>
+<div transition:fade={{ duration: 500, delay: 30 }} class="background">
+  <div class="modal">
+    <button class="close" on:click={() => dispatch('close')}>✖</button>
+    <slot />
+  </div>
 </div>
+
+<style>
+  .background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+  }
+
+  .modal {
+    justify-content: space-evenly;
+    align-items: center;
+    display: flex;
+    border-radius: 18px;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .close {
+    color: gray;
+    position: absolute;
+    top: 0.5em;
+    right: 1em;
+    cursor: pointer;
+    background: none;
+    border: none;
+    vertical-align: baseline;
+  }
+
+  .close:hover {
+    color: darkgray;
+  }
+
+  .close:active {
+    color: lightgray;
+  }
+</style>
