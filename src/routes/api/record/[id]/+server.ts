@@ -1,6 +1,7 @@
 import { DataBase, type PublicRecord } from '$lib/server/database.js';
 import { isUUID } from '$lib/typecheck.js';
 import { error, json } from '@sveltejs/kit';
+import norm from '../norm.js';
 
 export function GET({ params }) {
   if (!isUUID(params.id)) return error(400, { message: 'invalid param' });
@@ -8,7 +9,7 @@ export function GET({ params }) {
   const rec = DataBase.getRecord(params.id);
   if (!rec) return error(404, { message: 'record not found' });
 
-  return json(rec);
+  return json(norm(rec));
 }
 
 export async function POST({ params, url }) {
@@ -29,7 +30,7 @@ export async function POST({ params, url }) {
     ret = await DataBase.updateRecordDesc(rec, desc);
     if (!ret) return error(400, { message: 'content mod check' });
   }
-  if (ret) return json(ret);
+  if (ret) return json(norm(ret));
 
-  return json(DataBase.deleteRecord(rec) as PublicRecord);
+  return json(norm(DataBase.deleteRecord(rec) as PublicRecord));
 }

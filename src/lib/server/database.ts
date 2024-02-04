@@ -134,9 +134,9 @@ async function validateImage(img: Buffer): Promise<boolean> {
 }
 async function validateText(txt: string): Promise<boolean> {
   try {
-    const res = await analyzeComment(txt, { attributes: ['SEVERE_TOXICITY', 'IDENTITY_ATTACK'] });
+    const res = await analyzeComment(txt, { attributes: ['TOXICITY', 'IDENTITY_ATTACK'] });
     return (
-      res.attributeScores.SEVERE_TOXICITY.summaryScore.value < THRESHOLD &&
+      res.attributeScores.TOXICITY.summaryScore.value < THRESHOLD &&
       res.attributeScores.IDENTITY_ATTACK.summaryScore.value < THRESHOLD
     );
   } catch {

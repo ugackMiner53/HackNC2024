@@ -1,13 +1,14 @@
 import { DataBase } from '$lib/server/database';
 import { error, json } from '@sveltejs/kit';
+import norm from './norm.js';
 
 export function GET({ url }) {
-  const lat = Number(url.searchParams.get('lat')) + 90;
-  const lon = Number(url.searchParams.get('lon')) + 180;
+    const lat = Number(url.searchParams.get('lat')) + 90;
+    const lon = Number(url.searchParams.get('lon')) + 180;
 
-  if (Number.isNaN(lat) || Number.isNaN(lon)) return error(400, { message: 'invalid param' });
+    if (Number.isNaN(lat) || Number.isNaN(lon)) return error(400, { message: 'invalid param' });
 
-  return json(DataBase.getNearby(lat, lon));
+    return json(DataBase.getNearby(lat, lon).map(v => norm(v)));
 }
 
 export async function POST({ url }) {
@@ -21,5 +22,5 @@ export async function POST({ url }) {
   const rec = await DataBase.addRecord(lat, lon, name, desc);
   if (!rec) return error(400, { message: 'content mod check' });
 
-  return json(rec);
+  return json(norm(rec));
 }
