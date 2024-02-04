@@ -20,9 +20,10 @@ export let map: L.Map;
 export let selectionMarker: L.Marker | undefined;
 export const viewingImages: Writable<PublicImage[] | undefined> = writable(undefined);
 
-const records = new Set<UUID>();
+const records = new Map<UUID, RecordMarker>();
 
 let markerIcon: L.Icon;
+let markerImportantIcon: L.Icon;
 let userCircle: L.CircleMarker;
 
 let L: typeof import('leaflet');
@@ -52,14 +53,26 @@ export function createMap(mapElement: HTMLDivElement): L.Map {
   return map;
 }
 
-export function createMarkerIcon(): L.Icon {
-  markerIcon = new L.Icon({
-    iconUrl: '/images/marker-icon-2x.png',
-    iconSize: [50 / 2, 82 / 2],
-    iconAnchor: [50 / 4, 82 / 2],
-    shadowSize: [0, 0]
-  });
-  return markerIcon;
+export function createMarkerIcon() {
+    markerIcon = new L.Icon({
+        iconUrl: '/images/marker-icon-2x.png',
+        iconSize: [50 / 2, 82 / 2],
+        iconAnchor: [50 / 4, 82 / 2],
+        shadowSize: [0, 0]
+    });
+    markerImportantIcon = new L.Icon({
+        iconUrl: '/images/marker-important-icon-2x.png',
+        iconSize: [50 / 2, 82 / 2],
+        iconAnchor: [50 / 4, 82 / 2],
+        shadowSize: [0, 0]
+    });
+
+    let oldRecord : PublicRecord | undefined;
+    activeRecord.subscribe((valid) => {
+        if (oldRecord !== undefined) records.get(oldRecord!.uuid)?.setIcon(markerIcon);
+        if (valid !== undefined) records.get(valid!.uuid)?.setIcon(markerImportantIcon);
+        oldRecord = valid;
+    })
 }
 
 export function drawCurrentPosition(lat: number, lon: number) {
@@ -102,10 +115,12 @@ export function createRecordMarker(record: PublicRecord) {
   selectionMarker?.remove();
   selectionMarker = undefined;
 
-  records.add(record.uuid);
+  records.set(record.uuid, marker);
 }
 
 function handleMarkerClick(marker: RecordMarker) {
+//   if (get(activeRecord) !== undefined) records.get(get(activeRecord)!.uuid)?.setIcon(markerIcon);
+//   marker.setIcon(markerImportantIcon);
   activeRecord.set(marker._record);
 }
 
