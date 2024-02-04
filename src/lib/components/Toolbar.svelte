@@ -15,7 +15,7 @@
 </script>
 <style>
     .toolbar {
-        width: 20%;
+        width: max(20%, 200px);
         /* min-width: 200px; */
         white-space: nowrap;
         max-width: 390px;
