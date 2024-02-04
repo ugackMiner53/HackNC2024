@@ -11,9 +11,9 @@ type PPSpan = {
   end: number;
   score: PPScore;
 };
-type PPR = {
+type PPR<T extends string | number | symbol> = {
   attributeScores: {
-    [x in keyof PPTypes]: {
+    [x in T]: {
       spanScores: PPSpan[];
       summaryScore: PPScore;
     };
@@ -45,25 +45,25 @@ type PPTypes = {
   UNSUBSTANTIAL: {};
 };
 type PP = {
-  analyze: (
+  analyze: <T extends Partial<PPTypes>>(
     text:
       | string
       | {
           comment: {
             text: string;
           };
-          requestedAttributes: PPTypes;
+          requestedAttributes: T;
         },
     options:
       | {
-          attributes: (keyof PPTypes)[];
+          attributes: (keyof T)[];
           stripHTML?: boolean;
           truncate?: boolean;
           doNotScore?: boolean;
           validate?: boolean;
         }
       | undefined
-  ) => Promise<PPR>;
+  ) => Promise<PPR<keyof T>>;
 };
 
 const perspective: PP = new Perspective({ apiKey: PERSPECTIVE_API_KEY });
